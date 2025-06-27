@@ -66,4 +66,4 @@ This app demonstrates:
 5. **State Management**: Managing user state and authentication
 6. **UI/UX Patterns**: Onboarding flows and form handling
 
-See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for detailed explanations of each concept and how they work together. 
+See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for detailed explanations of each concept and how they work together.

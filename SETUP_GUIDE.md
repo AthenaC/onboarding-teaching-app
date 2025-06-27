@@ -246,17 +246,10 @@ Now let's set up the web frontend:
 cd ../frontend
 npm create vite@latest . -- --template react-ts
 npm install
-npm install axios react-router-dom
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
 ```
 
 **Why these choices:**
 - `vite`: Super fast development server
-- `react-ts`: React with TypeScript template
-- `axios`: HTTP client for API calls
-- `react-router-dom`: Client-side routing
-- `tailwindcss`: Utility-first CSS framework
 
 ### Step 9: Mobile Foundation
 
@@ -266,8 +259,6 @@ Set up React Native with Expo:
 cd ../mobile
 npx create-expo-app@latest . --template blank-typescript
 npm install nativewind
-npm install -D tailwindcss
-npx tailwindcss init
 ```
 
 **Why Expo?** It handles all the complex native build configuration. You can test on your phone instantly with the Expo Go app.
@@ -279,163 +270,371 @@ Create the shared package for common code:
 ```bash
 cd ../shared
 npm init -y
-npm install axios
-npm install -D typescript
 ```
 
-This is where we'll put:
-- API client configuration
-- Common TypeScript interfaces
-- Utility functions used by both platforms
+**Why**: Shared code needs to be accessible by both frontend and mobile, with common types and API utilities.
 
-## How Everything Connects
-
-Now let me explain how all these pieces work together:
-
-### 1. Data Flow
-```
-User Action → Frontend/Mobile → API Request → Backend → Database
-                ↑                                    ↓
-                ← Response ← Backend ← Database ←
-```
-
-### 2. Type Safety
-We define interfaces in the shared package:
-
-```typescript
-// shared/src/types/user.ts
-export interface User {
-  id: number;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  onboardingCompleted: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreateUserRequest {
-  email: string;
-  password: string;
-  firstName?: string;
-  lastName?: string;
-}
-```
-
-Both frontend and mobile import these types, ensuring consistency.
-
-### 3. API Communication
-The shared package contains our API client:
-
-```typescript
-// shared/src/api/client.ts
-import axios from 'axios';
-
-const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:5000';
-
-export const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
+### TypeScript Configuration
+Create `shared/tsconfig.json`:
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
   },
-});
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
 ```
 
-### 4. Authentication Flow
-1. User enters email/password
-2. Frontend sends to `/auth/register` or `/auth/login`
-3. Backend validates and creates/verifies user
-4. Backend returns JWT token
-5. Frontend stores token and includes it in future requests
-6. Backend middleware validates token on protected routes
+### Create Shared Structure
+```bash
+mkdir -p src/{api,types,utils}
+```
 
-## Development Workflow
+## Step 11: Database Setup
 
-Here's how you'll typically work:
+### PostgreSQL Setup
+```bash
+# Create database
+createdb cross_platform_template
 
-1. **Start all services**: `npm run dev` (runs backend, frontend, and mobile)
-2. **Database changes**: Create migration → run migration → update types
-3. **API changes**: Update backend → update shared types → update frontend/mobile
-4. **UI changes**: Update components → test on both platforms
+# Create user (optional)
+createuser -P cross_platform_user
+```
 
-## Common Patterns You'll Learn
+### Knex Configuration
+Create `backend/knexfile.js`:
+```javascript
+require('dotenv').config();
 
-### 1. Form Handling
-```typescript
-const [formData, setFormData] = useState({
-  email: '',
-  password: '',
-});
+module.exports = {
+  development: {
+    client: 'postgresql',
+    connection: {
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 5432,
+      database: process.env.DB_NAME || 'cross_platform_template',
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD || '',
+    },
+    migrations: {
+      directory: './src/db/migrations',
+    },
+    seeds: {
+      directory: './src/db/seeds',
+    },
+  },
+  test: {
+    client: 'postgresql',
+    connection: {
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 5432,
+      database: process.env.DB_NAME_TEST || 'cross_platform_template_test',
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD || '',
+    },
+    migrations: {
+      directory: './src/db/migrations',
+    },
+    seeds: {
+      directory: './src/db/seeds',
+    },
+  },
+  production: {
+    client: 'postgresql',
+    connection: {
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT || 5432,
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      ssl: { rejectUnauthorized: false },
+    },
+    migrations: {
+      directory: './src/db/migrations',
+    },
+    seeds: {
+      directory: './src/db/seeds',
+    },
+  },
+};
+```
 
-const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
-  try {
-    const response = await apiClient.post('/auth/register', formData);
-    // Handle success
-  } catch (error) {
-    // Handle error
+## Step 12: Environment Variables
+
+### Backend (.env)
+```bash
+cd backend
+cp env.example .env
+```
+
+Create `backend/env.example`:
+```env
+PORT=5000
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=cross_platform_template
+DB_USER=postgres
+DB_PASSWORD=
+NODE_ENV=development
+```
+
+### Frontend (.env)
+```bash
+cd ../frontend
+cp env.example .env
+```
+
+Create `frontend/env.example`:
+```env
+VITE_API_URL=http://localhost:5000
+```
+
+### Mobile (.env)
+```bash
+cd ../mobile
+cp env.example .env
+```
+
+Create `mobile/env.example`:
+```env
+EXPO_PUBLIC_API_URL=http://localhost:5000
+```
+
+## Step 13: Root Package.json Scripts
+
+Update the root `package.json`:
+```json
+{
+  "name": "cross-platform-template",
+  "version": "1.0.0",
+  "description": "A minimal template for cross-platform PERN stack applications",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:mobile\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:mobile": "cd mobile && npm start",
+    "build": "npm run build:backend && npm run build:frontend && npm run build:mobile",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build:mobile": "cd mobile && npm run build",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ../mobile && npm install && cd ../shared && npm install",
+    "setup": "npm run install:all && npm run setup:env && npm run setup:db",
+    "setup:env": "cp backend/env.example backend/.env && cp frontend/env.example frontend/.env && cp mobile/env.example mobile/.env",
+    "setup:db": "cd backend && npm run migrate && npm run seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.0"
   }
-};
+}
 ```
 
-### 2. Protected Routes
-```typescript
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
-  
-  if (loading) return <LoadingSpinner />;
-  if (!user) return <Navigate to="/login" />;
-  
-  return <>{children}</>;
-};
+## Step 14: Setup Script
+
+Create `setup.sh` for automated installation:
+```bash
+#!/bin/bash
+
+echo "🚀 Setting up Cross-Platform Template..."
+
+# Install root dependencies
+echo "📦 Installing root dependencies..."
+npm install
+
+# Install backend dependencies
+echo "🔧 Installing backend dependencies..."
+cd backend
+npm install
+cd ..
+
+# Install frontend dependencies
+echo "🌐 Installing frontend dependencies..."
+cd frontend
+npm install
+cd ..
+
+# Install mobile dependencies
+echo "📱 Installing mobile dependencies..."
+cd mobile
+npm install
+cd ..
+
+# Install shared dependencies
+echo "📚 Installing shared dependencies..."
+cd shared
+npm install
+cd ..
+
+# Copy environment files
+echo "⚙️ Setting up environment files..."
+cp backend/env.example backend/.env
+cp frontend/env.example frontend/.env
+cp mobile/env.example mobile/.env
+
+echo "✅ Setup complete!"
+echo ""
+echo "Next steps:"
+echo "1. Configure your database in backend/.env"
+echo "2. Run 'npm run dev' to start all services"
+echo "3. Check SETUP_GUIDE.md for detailed instructions"
+echo ""
+echo "Happy coding! 🎉"
 ```
 
-### 3. Cross-Platform Components
-```typescript
-// Works on both web and mobile
-const Button = ({ onPress, children }: ButtonProps) => {
-  return (
-    <Pressable onPress={onPress} className="bg-blue-500 p-4 rounded">
-      <Text className="text-white text-center">{children}</Text>
-    </Pressable>
-  );
-};
+Make it executable:
+```bash
+chmod +x setup.sh
 ```
+
+## Step 15: Complete File Structure
+
+### Backend Structure
+```
+backend/
+├── src/
+│   ├── controllers/
+│   │   └── index.ts
+│   ├── middleware/
+│   │   └── index.ts
+│   ├── models/
+│   │   └── index.ts
+│   ├── routes/
+│   │   └── index.ts
+│   ├── db/
+│   │   ├── migrations/
+│   │   │   └── 20240101000001_create_example_table.js
+│   │   ├── seeds/
+│   │   │   └── 01_example_seed.js
+│   │   └── database.ts
+│   ├── utils/
+│   │   └── index.ts
+│   └── server.ts
+├── package.json
+├── tsconfig.json
+├── knexfile.js
+└── env.example
+```
+
+### Frontend Structure
+```
+frontend/
+├── src/
+│   ├── components/
+│   │   └── index.ts
+│   ├── pages/
+│   │   └── HomePage.tsx
+│   ├── hooks/
+│   │   └── index.ts
+│   ├── utils/
+│   │   └── index.ts
+│   ├── App.tsx
+│   ├── main.tsx
+│   ├── index.css
+│   └── App.css
+├── package.json
+├── vite.config.ts
+├── tailwind.config.js
+├── postcss.config.js
+├── tsconfig.json
+├── tsconfig.node.json
+├── index.html
+└── env.example
+```
+
+### Mobile Structure
+```
+mobile/
+├── app/
+│   ├── _layout.tsx
+│   └── index.tsx
+├── components/
+│   └── index.ts
+├── store/
+│   └── index.ts
+├── package.json
+├── app.json
+├── babel.config.js
+├── tailwind.config.js
+├── tsconfig.json
+├── index.ts
+└── env.example
+```
+
+### Shared Structure
+```
+shared/
+├── src/
+│   ├── api/
+│   │   └── client.ts
+│   ├── types/
+│   │   └── index.ts
+│   ├── utils/
+│   │   └── index.ts
+│   └── index.ts
+├── package.json
+└── tsconfig.json
+```
+
+### Root Structure
+```
+cross-platform-template/
+├── backend/
+├── frontend/
+├── mobile/
+├── shared/
+├── docs/
+│   ├── API.md
+│   └── DEPLOYMENT.md
+├── setup.sh
+├── package.json
+├── .gitignore
+├── README.md
+├── SETUP_GUIDE.md
+└── INSTALLATION.md
+```
+
+## Step 16: Development Workflow
+
+1. **Start all services**: `npm run dev`
+2. **Backend only**: `npm run dev:backend`
+3. **Frontend only**: `npm run dev:frontend`
+4. **Mobile only**: `npm run dev:mobile`
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Port conflicts**: Change ports in `.env` files
+2. **Database connection**: Ensure PostgreSQL is running
+3. **Mobile build issues**: Clear Expo cache with `expo start -c`
+4. **TypeScript errors**: Run `npm run build` to check for type issues
+
+### Best Practices
+
+1. **Environment variables**: Never commit `.env` files
+2. **Database migrations**: Always use migrations for schema changes
+3. **Type safety**: Use TypeScript interfaces for API responses
+4. **Code organization**: Keep shared code in the shared directory
+5. **Testing**: Add tests for critical functionality
 
 ## Next Steps
 
-This foundation gives you:
-- ✅ Type-safe backend API
-- ✅ Database with migrations
-- ✅ Frontend with routing
-- ✅ Mobile app with Expo
-- ✅ Shared code structure
-- ✅ Authentication foundation
+This template provides a solid foundation for cross-platform development. You can now:
 
-In the next phase, we'll build:
-1. User registration and login
-2. Onboarding flow screens
-3. Profile management
-4. Cross-platform navigation
-5. State management
+1. Add authentication
+2. Implement CRUD operations
+3. Add state management (Redux, Zustand)
+4. Set up testing frameworks
+5. Add CI/CD pipelines
 
-## Troubleshooting Tips
-
-**Database connection issues:**
-- Make sure PostgreSQL is running
-- Check your `.env` file has correct credentials
-- Try `npx knex migrate:latest` to run migrations
-
-**Mobile build issues:**
-- Clear Expo cache: `expo start -c`
-- Make sure you have Expo Go app installed
-- Check that your phone and computer are on same network
-
-**TypeScript errors:**
-- Run `npm run build` to see all type errors
-- Make sure shared types are exported correctly
-- Check that API responses match your interfaces
-
-This foundation sets you up for success! The key is understanding how each piece connects to the others. TypeScript helps catch errors early, shared code reduces duplication, and the modular structure makes it easy to add new features.
-
-Ready to start building the actual onboarding flow? Let's dive in! 
+The template is designed to be minimal but extensible, allowing you to build any type of cross-platform application.
