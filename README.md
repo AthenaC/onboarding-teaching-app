@@ -1,69 +1,151 @@
-# Onboarding Teaching App
+# Product Store Demo App
 
-A simple onboarding application that demonstrates TypeScript, React Native, and cross-platform development concepts. This app serves as a learning tool to understand how different technologies work together.
-
-## Features
-
-- **User Registration & Login**: Basic authentication flow
-- **Onboarding Flow**: Multi-step onboarding process
-- **Profile Management**: User profile creation and editing
-- **Cross-Platform**: Works on web and mobile
-- **TypeScript**: Full type safety across the stack
-- **Modern Stack**: React, React Native, Express, PostgreSQL
-
-## Quick Start
-
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd onboarding-teaching-app
-
-# Install dependencies
-npm run install:all
-
-# Set up environment variables
-npm run setup:env
-
-# Set up database
-npm run setup:db
-
-# Start development servers
-npm run dev
-```
-
-## Tech Stack
-
-- **Backend**: Node.js, Express, TypeScript, PostgreSQL, Knex.js
-- **Frontend**: React, TypeScript, Vite, Tailwind CSS
-- **Mobile**: React Native, Expo, TypeScript, NativeWind
-- **Shared**: TypeScript, Axios
+A full-stack product store application built with React Native (TypeScript) frontend and Node.js/PostgreSQL backend.
 
 ## Project Structure
 
 ```
-├── backend/          # Express API server
-├── frontend/         # React web application
-├── mobile/           # React Native mobile app
-├── shared/           # Shared types and utilities
-└── docs/             # Documentation and tutorials
+onboarding-teaching-app/
+├── mobile/                 # React Native TypeScript frontend
+│   ├── app/               # Expo Router screens
+│   │   └── (tabs)/        # Tab navigation screens
+│   ├── components/        # Reusable UI components
+│   │   ├── screens/       # Screen components
+│   │   └── ui/           # UI components (Button, ProductCard)
+│   ├── context/          # React Context (CartContext)
+│   ├── hooks/            # Custom hooks (useProducts, useOrders)
+│   ├── types/            # TypeScript type definitions
+│   ├── utils/            # Utility functions and mock data
+│   └── constants/        # App constants (colors, etc.)
+├── backend/              # Node.js Express backend
+│   ├── src/
+│   │   ├── controllers/  # API route handlers
+│   │   ├── models/       # Data models
+│   │   ├── routes/       # API routes
+│   │   ├── db/          # Database setup and migrations
+│   │   └── middleware/   # Express middleware
+│   └── knexfile.js      # Database configuration
+└── setup.sh             # Project setup script
 ```
+
+## Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+- Expo CLI (`npm install -g @expo/cli`)
+- PostgreSQL (for backend)
+
+## Backend Setup
+
+1. **Navigate to the backend directory:**
+   ```bash
+   cd backend
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables:**
+   ```bash
+   cp env.example .env
+   ```
+   
+   Create a `.env` file in the backend directory and add the following variables:
+   ```
+   PORT=3001
+   DATABASE_URL=postgresql://username:password@localhost:5432/product_store
+   NODE_ENV=development
+   ```
+
+4. **Configure PostgreSQL database:**
+   - Make sure your PostgreSQL server is running
+   - Create a database named 'product_store'
+   - Update the DATABASE_URL in your .env file
+
+5. **Run migrations:**
+   ```bash
+   npm run migrate
+   ```
+
+6. **Seed the database (optional):**
+   ```bash
+   npm run seed
+   ```
+
+7. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+
+The backend API will be available at http://localhost:3001
+
+## Frontend Setup
+
+1. **Navigate to the mobile directory:**
+   ```bash
+   cd mobile
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server:**
+   ```bash
+   npm start
+   ```
+
+The mobile app will be available through Expo Go or simulators.
+
+## API Endpoints
+
+- `GET /api/products` - List all products
+- `GET /api/products/:id` - Retrieve a specific product
+- `GET /api/users` - List all users
+- `GET /api/orders` - List all orders
+- `POST /api/orders` - Create a new order
+- `PUT /api/orders/:id` - Update an order
+- `DELETE /api/orders/:id` - Delete an order
+
+## Features
+
+- Browse product catalog with images and descriptions
+- Add/remove items from shopping cart
+- Manage item quantities in cart
+- View order history with status tracking
+- Responsive design with modern UI components
+- TypeScript for type safety
+- RESTful API architecture
+- Mock data mode for offline demonstration
+
+## Technologies Used
+
+### Frontend
+- React Native
+- TypeScript
+- Expo
+- Expo Router
+- React Context API
+- Expo Vector Icons
+
+### Backend
+- Node.js
+- Express
+- TypeScript
+- PostgreSQL
+- Knex.js ORM
 
 ## Development
 
-- `npm run dev` - Start all development servers
-- `npm run dev:backend` - Start backend only
-- `npm run dev:frontend` - Start frontend only
-- `npm run dev:mobile` - Start mobile only
+- Expo development server: `npm start`
+- Backend development server: `npm run dev`
+- Database migrations: `npm run migrate`
+- Seed database: `npm run seed`
 
-## Learning Objectives
+## License
 
-This app demonstrates:
+MIT License - see LICENSE file for details.
 
-1. **TypeScript Integration**: How to use TypeScript across the stack
-2. **Cross-Platform Development**: Sharing code between web and mobile
-3. **Database Design**: User management and relationships
-4. **API Design**: RESTful endpoints and error handling
-5. **State Management**: Managing user state and authentication
-6. **UI/UX Patterns**: Onboarding flows and form handling
-
-See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for detailed explanations of each concept and how they work together.
