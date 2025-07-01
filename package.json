@@ -15,7 +15,8 @@
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ../mobile && npm install && cd ../shared && npm install",
     "setup": "npm run install:all && npm run setup:env && npm run setup:db",
     "setup:env": "cp backend/.env.example backend/.env && cp frontend/.env.example frontend/.env && cp mobile/.env.example mobile/.env",
-    "setup:db": "cd backend && npm run migrate && npm run seed"
+    "setup:db": "cd backend && npm run migrate && npm run seed",
+    "format": "prettier --write ."
   },
   "keywords": ["template", "cross-platform", "pern", "react", "react-native", "express"],
   "author": "",

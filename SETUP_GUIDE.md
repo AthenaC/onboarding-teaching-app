@@ -143,7 +143,7 @@ module.exports = {
 Create `backend/.env.example`:
 
 ```env
-PORT=5000
+PORT=3001
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=onboarding_app
@@ -170,7 +170,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(helmet()); // Security headers
@@ -380,7 +380,7 @@ cp env.example .env
 
 Create `backend/env.example`:
 ```env
-PORT=5000
+PORT=3001
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=cross_platform_template
@@ -397,7 +397,7 @@ cp env.example .env
 
 Create `frontend/env.example`:
 ```env
-VITE_API_URL=http://localhost:5000
+VITE_API_URL=http://localhost:3001
 ```
 
 ### Mobile (.env)
@@ -408,7 +408,7 @@ cp env.example .env
 
 Create `mobile/env.example`:
 ```env
-EXPO_PUBLIC_API_URL=http://localhost:5000
+EXPO_PUBLIC_API_URL=http://localhost:3001
 ```
 
 ## Step 13: Root Package.json Scripts

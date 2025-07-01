@@ -1,2 +1,5 @@
-// Models will be added here
-// Example: User, Product, etc. 
+import User from "./User";
+import Product from "./Product";
+import Order from "./Order";
+
+export { User, Product, Order };

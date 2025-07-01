@@ -210,7 +210,7 @@ nano backend/.env
 Update the database configuration:
 
 ```env
-PORT=5000
+PORT=3001
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=cross_platform_template
@@ -241,7 +241,7 @@ npm run dev
 
 ### 2. Check Each Service
 
-- **Backend**: http://localhost:5000/health
+- **Backend**: http://localhost:3001/health
 - **Frontend**: http://localhost:3000
 - **Mobile**: Scan QR code with Expo Go app
 
@@ -252,7 +252,7 @@ npm run dev
 #### Port Already in Use
 ```bash
 # Check what's using the port
-lsof -i :5000
+lsof -i :3001
 lsof -i :3000
 
 # Kill the process
