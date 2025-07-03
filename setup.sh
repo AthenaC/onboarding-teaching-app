@@ -12,28 +12,15 @@ cd backend
 npm install
 cd ..
 
-# Install frontend dependencies
-echo "🌐 Installing frontend dependencies..."
-cd frontend
-npm install
-cd ..
-
 # Install mobile dependencies
 echo "📱 Installing mobile dependencies..."
 cd mobile
 npm install
 cd ..
 
-# Install shared dependencies
-echo "📚 Installing shared dependencies..."
-cd shared
-npm install
-cd ..
-
 # Copy environment files
 echo "⚙️ Setting up environment files..."
 cp backend/env.example backend/.env
-cp frontend/env.example frontend/.env
 cp mobile/env.example mobile/.env
 
 echo "✅ Setup complete!"

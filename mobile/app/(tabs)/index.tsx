@@ -1,14 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
 import { useProducts } from '../../hooks/useProducts';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { Product } from '../../types';
 import { Colors } from '../../constants/colors';
-import { useRouter } from 'expo-router';
 
 export default function ProductsScreen() {
   const { products, loading, error } = useProducts();
-  const router = useRouter();
 
   const handleProductPress = (product: Product) => {
     // Product press handler - can be extended for navigation later
@@ -35,7 +39,7 @@ export default function ProductsScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Product Store</Text>
       <Text style={styles.subtitle}>Found {products.length} products</Text>
-      
+
       <FlatList
         data={products}
         keyExtractor={(item) => item.id.toString()}

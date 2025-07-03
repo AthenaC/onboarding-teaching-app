@@ -7,7 +7,7 @@ import {
 import { Product } from "../types";
 
 // Use computer's IP address for physical device with Expo Go
-const baseUrl = "http://***REMOVED***:3001/api/products";
+const baseUrl = "http://localhost:3001/api/products";
 
 export const createProduct = async (productData: Partial<Product>) => {
   if (!productData) {
